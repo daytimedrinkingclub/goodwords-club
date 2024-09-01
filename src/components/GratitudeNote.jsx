@@ -21,7 +21,7 @@ const rotations = ["rotate-1", "-rotate-1", "rotate-2", "-rotate-2"];
 const getColor = (id) => colors[id % colors.length];
 const getRotation = (id) => rotations[id % rotations.length];
 
-const GratitudeNote = ({ id, name, content, tags }) => {
+const GratitudeNote = ({ id, name, content, tags = [] }) => {
   const color = getColor(id);
   const rotation = getRotation(id);
 

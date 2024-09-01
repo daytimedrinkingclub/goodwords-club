@@ -108,22 +108,6 @@ const App = () => {
     };
   }, [loading]);
 
-  const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop !==
-        document.documentElement.offsetHeight ||
-      loading
-    ) {
-      return;
-    }
-    fetchGratitudes();
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [loading]);
-
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
@@ -132,24 +116,32 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-100 to-blue-100 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-pink-100 to-blue-100 p-4 md:p-8">
       <div className="container mx-auto max-w-6xl">
         <header className="text-center mb-8">
           <h1 className="text-4xl font-bold text-pink-600 mb-2">
             Good Words Club
           </h1>
           <p className="text-gray-600">
-            Spread positivity and share what you're grateful for!
+            Spread positivity and share what you&apos;re grateful for! Built by{" "}
+            <a
+              href="https://agisharma.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-pink-600 hover:text-pink-500"
+            >
+              Anuj Sharma
+            </a>
           </p>
         </header>
 
         <Masonry
           breakpointCols={breakpointColumnsObj}
-          className="flex w-auto -ml-4"
-          columnClassName="pl-8 bg-clip-padding"
+          className="flex w-auto -ml-0 md:-ml-4"
+          columnClassName="pl-0 md:pl-8 bg-clip-padding"
         >
           {gratitudes.map((gratitude) => (
-            <div key={gratitude.id} className="mb-8">
+            <div key={gratitude.id} className="mb-4 md:mb-8">
               <GratitudeNote {...gratitude} />
             </div>
           ))}

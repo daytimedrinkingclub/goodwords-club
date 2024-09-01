@@ -10,14 +10,24 @@ const App = () => {
             Good Words Club
           </h1>
           <p className="text-gray-600">
-            Spread positivity and share what you&apos;re grateful for! Built by{" "}
+            Spread positivity and share what you&apos;re grateful for!
+            <a
+              href="https://github.com/ptmaroct/goodwords-club"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#0366d6] hover:text-[#0366d6]"
+            >
+              {" "}
+              Built
+            </a>{" "}
+            with ❤️ by{" "}
             <a
               href="https://agisharma.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-pink-600 hover:text-pink-500"
             >
-              Anuj Sharma
+              Anuj
             </a>
           </p>
         </header>

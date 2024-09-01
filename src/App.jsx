@@ -2,35 +2,32 @@ import { useState, useEffect, useRef } from "react";
 import Masonry from "react-masonry-css";
 import { Heart } from "lucide-react";
 
-const getRandomColor = () => {
-  const colors = [
-    "bg-yellow-200",
-    "bg-pink-200",
-    "bg-blue-200",
-    "bg-green-200",
-    "bg-purple-200",
-    "bg-red-200",
-    "bg-orange-200",
-    "bg-teal-200",
-    "bg-indigo-200",
-    "bg-gray-200",
-    "bg-lime-200",
-    "bg-amber-200",
-    "bg-cyan-200",
-    "bg-rose-200",
-    "bg-fuchsia-200",
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-};
+const colors = [
+  "bg-yellow-200",
+  "bg-pink-200",
+  "bg-blue-200",
+  "bg-green-200",
+  "bg-purple-200",
+  "bg-red-200",
+  "bg-orange-200",
+  "bg-teal-200",
+  "bg-indigo-200",
+  "bg-gray-200",
+  "bg-lime-200",
+  "bg-amber-200",
+  "bg-cyan-200",
+  "bg-rose-200",
+  "bg-fuchsia-200",
+];
 
-const getRandomRotation = () => {
-  const rotations = ["rotate-1", "-rotate-1", "rotate-2", "-rotate-2"];
-  return rotations[Math.floor(Math.random() * rotations.length)];
-};
+const rotations = ["rotate-1", "-rotate-1", "rotate-2", "-rotate-2"];
 
-const GratitudeNote = ({ name, content, tags }) => {
-  const color = getRandomColor();
-  const rotation = getRandomRotation();
+const getColor = (id) => colors[id % colors.length];
+const getRotation = (id) => rotations[id % rotations.length];
+
+const GratitudeNote = ({ id, name, content, tags }) => {
+  const color = getColor(id);
+  const rotation = getRotation(id);
 
   return (
     <div

@@ -1,14 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Masonry from "react-masonry-css";
 import { Heart } from "lucide-react";
 import {
   ref,
   query,
   orderByChild,
-  limitToLast,
-  endBefore,
   onChildAdded,
-  get,
+  onValue,
   off,
 } from "firebase/database";
 import { database } from "../firebase";
@@ -16,95 +14,39 @@ import GratitudeNote from "./GratitudeNote";
 
 const GratitudeList = () => {
   const [gratitudes, setGratitudes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [lastTimestamp, setLastTimestamp] = useState(null);
-  const loader = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const gratitudeRef = ref(database, "gratitudes");
-    const gratitudeQuery = query(
-      gratitudeRef,
-      orderByChild("timestamp"),
-      limitToLast(10)
-    );
+    const gratitudeQuery = query(gratitudeRef, orderByChild("timestamp"));
 
-    const loadInitialGratitudes = async () => {
-      const snapshot = await get(gratitudeQuery);
+    const handleSnapshot = (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const gratitudeList = Object.entries(data)
           .map(([key, value]) => ({ id: key, ...value }))
           .sort((a, b) => b.timestamp - a.timestamp);
         setGratitudes(gratitudeList);
-        setLastTimestamp(gratitudeList[gratitudeList.length - 1].timestamp);
+        setLoading(false);
+      } else {
+        setGratitudes([]);
+        setLoading(false);
       }
     };
 
-    loadInitialGratitudes();
-
-    // Listen for new gratitudes
     const handleNewGratitude = (snapshot) => {
       const newGratitude = { id: snapshot.key, ...snapshot.val() };
       setGratitudes((prev) => [newGratitude, ...prev]);
     };
 
+    onValue(gratitudeQuery, handleSnapshot);
     onChildAdded(gratitudeQuery, handleNewGratitude);
 
     return () => {
-      // Clean up the listener
+      off(gratitudeQuery, "value", handleSnapshot);
       off(gratitudeQuery, "child_added", handleNewGratitude);
     };
   }, []);
-
-  const fetchMoreGratitudes = async () => {
-    if (loading || !lastTimestamp) return;
-
-    setLoading(true);
-    const gratitudeRef = ref(database, "gratitudes");
-    const gratitudeQuery = query(
-      gratitudeRef,
-      orderByChild("timestamp"),
-      endBefore(lastTimestamp),
-      limitToLast(10)
-    );
-
-    try {
-      const snapshot = await get(gratitudeQuery);
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const newGratitudes = Object.entries(data)
-          .map(([key, value]) => ({ id: key, ...value }))
-          .sort((a, b) => b.timestamp - a.timestamp);
-        setGratitudes((prev) => [...prev, ...newGratitudes]);
-        setLastTimestamp(newGratitudes[newGratitudes.length - 1].timestamp);
-      }
-    } catch (error) {
-      console.error("Error fetching more gratitudes:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading) {
-          fetchMoreGratitudes();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (loader.current) {
-      observer.observe(loader.current);
-    }
-
-    return () => {
-      if (loader.current) {
-        observer.unobserve(loader.current);
-      }
-    };
-  }, [loading]);
 
   const breakpointColumnsObj = {
     default: 4,
@@ -113,6 +55,14 @@ const GratitudeList = () => {
     500: 1,
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center mt-8">
+        <Heart className="text-pink-500 animate-pulse" size={48} />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mb-8">
@@ -120,7 +70,7 @@ const GratitudeList = () => {
           Recent Gratitude Notes
         </h2>
         <p className="text-gray-600">
-          Scroll down to see more heartwarming messages from our community.
+          Heartwarming messages from our community.
         </p>
       </div>
 
@@ -135,13 +85,6 @@ const GratitudeList = () => {
           </div>
         ))}
       </Masonry>
-
-      {loading && (
-        <div className="flex justify-center items-center mt-8">
-          <Heart className="text-pink-500 animate-pulse" size={48} />
-        </div>
-      )}
-      <div ref={loader} className="h-10"></div>
     </>
   );
 };

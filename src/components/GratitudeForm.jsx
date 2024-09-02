@@ -16,7 +16,7 @@ const GratitudeForm = ({ onSubmit }) => {
       content,
       tags: tags
         .split(",")
-        .map((tag) => tag.trim())
+        .map((tag) => tag.trim().replace(/^#/, '')) // Remove leading hash
         .filter((tag) => tag !== ""),
       timestamp: Date.now(),
     })

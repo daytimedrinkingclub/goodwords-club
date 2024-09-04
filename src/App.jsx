@@ -28,6 +28,15 @@ const App = () => {
               className="text-pink-600 hover:text-pink-500"
             >
               Anuj
+            </a>{" "}
+            for{" "}
+            <a
+              href="https://incubatorop.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-500"
+            >
+              IncubatorOP.com
             </a>
           </p>
         </header>

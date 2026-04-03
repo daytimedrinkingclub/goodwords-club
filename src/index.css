@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Poppins:wght@400;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -41,6 +41,35 @@ body, html {
 #root {
   width: 100%;
   height: 100%;
+}
+
+.emoji-burst-particle {
+  position: absolute;
+  transform: translate3d(-50%, 0, 0);
+  animation-name: emoji-burst-pop;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation-fill-mode: forwards;
+  filter: drop-shadow(0 8px 12px rgba(15, 23, 42, 0.12));
+  will-change: transform, opacity;
+}
+
+@keyframes emoji-burst-pop {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, 12px, 0) scale(0.72) rotate(0deg);
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(
+        calc(-50% + var(--burst-drift-x, 0px)),
+        var(--burst-drift-y, -140px),
+        0
+      )
+      scale(1.06) rotate(var(--burst-rotate, 0deg));
+  }
 }
 
 h1 {

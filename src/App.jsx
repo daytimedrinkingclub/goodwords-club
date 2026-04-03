@@ -1,7 +1,10 @@
+import { useState } from "react";
 import GratitudeForm from "./components/GratitudeForm";
 import GratitudeList from "./components/GratitudeList";
 
 const App = () => {
+  const [recentlyAddedId, setRecentlyAddedId] = useState(null);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-100 to-blue-100 p-4 md:p-8">
       <div className="container mx-auto max-w-6xl">
@@ -41,8 +44,8 @@ const App = () => {
           </p>
         </header>
 
-        <GratitudeForm />
-        <GratitudeList />
+        <GratitudeForm onSubmit={setRecentlyAddedId} />
+        <GratitudeList highlightedId={recentlyAddedId} />
       </div>
     </div>
   );

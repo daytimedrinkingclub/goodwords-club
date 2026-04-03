@@ -2,15 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC4DR8ESHLmNxFMwtIA98wU1nOUoDj0CMM",
-  authDomain: "goodwordsclub-3f3be.firebaseapp.com",
+  apiKey: "AIzaSyDAwiHZLSedNFwfchehfN4ADt6EEQNrfDs",
+  authDomain: "goodwordsclub-3e27f.firebaseapp.com",
   databaseURL:
-    "https://goodwordsclub-3f3be-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "goodwordsclub-3f3be",
-  storageBucket: "goodwordsclub-3f3be.appspot.com",
-  messagingSenderId: "807553735253",
-  appId: "1:807553735253:web:1c37c13d3e585c8c9b92dc",
-  measurementId: "G-1X4PKRWBG0",
+    "https://goodwordsclub-3e27f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "goodwordsclub-3e27f",
+  storageBucket: "goodwordsclub-3e27f.firebasestorage.app",
+  messagingSenderId: "352915939024",
+  appId: "1:352915939024:web:b2623596888272595388d5",
 };
 
 const app = initializeApp(firebaseConfig);

@@ -1,35 +1,67 @@
 import { useState } from "react";
 import { ref, push } from "firebase/database";
 import { database } from "../firebase";
+import { validateContent } from "../validateGratitude";
+
+const CELEBRATION_EMOJIS = ["✨", "💖", "🌸", "🫶", "🌼", "💫", "🌷", "🎉"];
+
+const createEmojiBurst = () =>
+  Array.from({ length: 28 }, (_, index) => ({
+    id: `${Date.now()}-${index}`,
+    emoji:
+      CELEBRATION_EMOJIS[
+        Math.floor(Math.random() * CELEBRATION_EMOJIS.length)
+      ],
+    left: 4 + Math.random() * 92,
+    top: 8 + Math.random() * 72,
+    driftX: (Math.random() - 0.5) * 150,
+    driftY: -80 - Math.random() * 140,
+    delay: Math.random() * 0.22,
+    duration: 1.5 + Math.random() * 0.9,
+    rotate: (Math.random() - 0.5) * 110,
+    size: 1.1 + Math.random() * 0.9,
+  }));
 
 const GratitudeForm = ({ onSubmit }) => {
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [error, setError] = useState("");
+  const [emojiBurst, setEmojiBurst] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError("");
+
+    const result = validateContent(content);
+    if (!result.valid) {
+      setError(result.message);
+      return;
+    }
+
     const gratitudeRef = ref(database, "gratitudes");
-    push(gratitudeRef, {
+    const newGratitudeRef = push(gratitudeRef, {
       name: name || "Anonymous",
-      content,
+      content: content.trim(),
       tags: tags
         .split(",")
-        .map((tag) => tag.trim().replace(/^#/, '')) // Remove leading hash
+        .map((tag) => tag.trim().replace(/^#/, ""))
         .filter((tag) => tag !== ""),
       timestamp: Date.now(),
-    })
+    });
+
+    newGratitudeRef
       .then(() => {
         setName("");
         setContent("");
         setTags("");
-        setShowFeedback(true);
-        setTimeout(() => setShowFeedback(false), 3000);
+        setEmojiBurst(createEmojiBurst());
+        onSubmit?.(newGratitudeRef.key);
+        setTimeout(() => setEmojiBurst([]), 2400);
       })
       .catch((error) => {
         console.error("Error saving gratitude: ", error);
-        // Optionally, show an error message to the user
+        setError("Something went wrong. Please try again.");
       });
   };
 
@@ -62,12 +94,15 @@ const GratitudeForm = ({ onSubmit }) => {
           <textarea
             id="content"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => { setContent(e.target.value); setError(""); }}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
             rows="3"
             required
             placeholder="I'm grateful for..."
           ></textarea>
+          {error && (
+            <p className="mt-1 text-sm text-red-600">{error}</p>
+          )}
         </div>
         <div className="mb-4">
           <label htmlFor="tags" className="block text-gray-700 font-bold mb-2">
@@ -89,9 +124,26 @@ const GratitudeForm = ({ onSubmit }) => {
           Share Gratitude
         </button>
       </form>
-      {showFeedback && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          Gratitude shared successfully!
+      {emojiBurst.length > 0 && (
+        <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+          {emojiBurst.map((particle) => (
+            <span
+              key={particle.id}
+              className="emoji-burst-particle"
+              style={{
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
+                fontSize: `${particle.size}rem`,
+                animationDelay: `${particle.delay}s`,
+                animationDuration: `${particle.duration}s`,
+                "--burst-drift-x": `${particle.driftX}px`,
+                "--burst-drift-y": `${particle.driftY}px`,
+                "--burst-rotate": `${particle.rotate}deg`,
+              }}
+            >
+              {particle.emoji}
+            </span>
+          ))}
         </div>
       )}
     </>

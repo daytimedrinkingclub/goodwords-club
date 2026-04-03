@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Masonry from "react-masonry-css";
 import { Heart } from "lucide-react";
 import {
@@ -12,9 +12,11 @@ import {
 import { database } from "../firebase";
 import GratitudeNote from "./GratitudeNote";
 
-const GratitudeList = () => {
+const GratitudeList = ({ highlightedId }) => {
   const [gratitudes, setGratitudes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeHighlightId, setActiveHighlightId] = useState(null);
+  const noteRefs = useRef(new Map());
 
   useEffect(() => {
     const gratitudeRef = ref(database, "gratitudes");
@@ -48,6 +50,32 @@ const GratitudeList = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!highlightedId) return;
+
+    const targetNote = noteRefs.current.get(highlightedId);
+    if (!targetNote) return;
+
+    const frame = requestAnimationFrame(() => {
+      targetNote.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      setActiveHighlightId(highlightedId);
+    });
+
+    const timeout = setTimeout(() => {
+      setActiveHighlightId((currentId) =>
+        currentId === highlightedId ? null : currentId
+      );
+    }, 2600);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
+    };
+  }, [highlightedId, gratitudes]);
+
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
@@ -80,8 +108,22 @@ const GratitudeList = () => {
         columnClassName="pl-0 md:pl-8 bg-clip-padding"
       >
         {gratitudes.map((gratitude, index) => (
-          <div key={gratitude.id} className="mb-4 md:mb-8">
-            <GratitudeNote {...gratitude} id={index} />
+          <div
+            key={gratitude.id}
+            className="mb-4 scroll-mt-24 md:mb-8"
+            ref={(element) => {
+              if (element) {
+                noteRefs.current.set(gratitude.id, element);
+              } else {
+                noteRefs.current.delete(gratitude.id);
+              }
+            }}
+          >
+            <GratitudeNote
+              {...gratitude}
+              id={index}
+              isHighlighted={activeHighlightId === gratitude.id}
+            />
           </div>
         ))}
       </Masonry>
